@@ -4,7 +4,7 @@ import minimax
 """
 Agent skeleton. Fill in the gaps.
 """
-class Basic_Agent(AlphaBetaAgent):
+class MyAgent(AlphaBetaAgent):
 
   """
   This is the skeleton of an agent to play the Tak game.
@@ -20,14 +20,17 @@ class Basic_Agent(AlphaBetaAgent):
   state s.
   """
   def successors(self, state):
-    pass
+    actions = state.get_current_player_actions()
+    for action in actions:
+      newState = state.copy().apply_action(action)
+      yield (action, newState)
 
   """
   The cutoff function returns true if the alpha-beta/minimax
   search has to stop and false otherwise.
   """
   def cutoff(self, state, depth):
-    return depth == 1;
+    return depth <= 1 and state.game_over();
 
   """
   The evaluate function must return an integer value
