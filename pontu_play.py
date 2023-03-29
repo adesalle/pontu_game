@@ -17,8 +17,8 @@ if __name__ == '__main__':
   )
   args = parser.parse_args()
 
-  agent0 = args.ai0 if args.ai0 != None else "human_agent"
-  agent1 = args.ai1 if args.ai1 != None else "human_agent"
+  agent0 = args.ai0 if args.ai0 != None else "smart_agent"
+  agent1 = args.ai1 if args.ai1 != None else "smart"
   time_out = float(args.t) if args.t != None else 900.0
   first = int(args.f) if args.f == '1' or args.f == '0' else None
   display_gui = args.g == None or args.g.lower() == "true"
@@ -31,6 +31,7 @@ if __name__ == '__main__':
   initial_state = PontuState()
   if first is not None:
     initial_state.cur_player = first
+  initial_state.cur_player = 0
   agent0 = getattr(__import__(agent0), 'MyAgent')()
   agent0.set_id(0)
   agent1 = getattr(__import__(agent1), 'MyAgent')()
