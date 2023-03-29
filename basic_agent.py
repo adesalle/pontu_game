@@ -20,16 +20,17 @@ class MyAgent(AlphaBetaAgent):
   state s.
   """
   def successors(self, state):
+    list = []
     if state != None:
       actions = state.get_current_player_actions()
-      list = []
+
       for action in actions:
 
         if state.is_action_valid(action):
           newState = state.copy()
           newState.apply_action()
           list.add((action, newState))
-      return list
+    return list
 
   """
   The cutoff function returns true if the alpha-beta/minimax
@@ -46,7 +47,7 @@ class MyAgent(AlphaBetaAgent):
   """
   def evaluate(self, state):
     utility = 0
-    thisPlayer = state.cur_player
+    thisPlayer = state.get_cur_player()
     advPlayer = 1 - thisPlayer
     for player in (thisPlayer, advPlayer):
       offset = 1
@@ -60,4 +61,4 @@ class MyAgent(AlphaBetaAgent):
           return -100
       for pawn in range(state.size()-2):
         utility += offset * (len(state.move_dir(player, pawn)))
-      return utility
+    return utility
