@@ -4,7 +4,7 @@ import minimax
 """
 Agent skeleton. Fill in the gaps.
 """
-DIRECTIONS = ['WEST','NORTH','EAST','SOUTH']
+
 
 class MyAgent(AlphaBetaAgent):
     """
@@ -51,10 +51,17 @@ class MyAgent(AlphaBetaAgent):
 
     def evaluate(self, state):
         utility = 0
-        player = 1 - self.id
-        for pawn in range(len(state.cur_pos[0])):
-            adj_bridges = state.adj_bridges(player, pawn)
-            for dir in DIRECTIONS:
-                if not adj_bridges[dir]:
-                    utility+=1
+        thisPlayer = self.id
+        advPlayer = 1 - thisPlayer
+        for player in (thisPlayer, advPlayer):
+            offset = 1
+            if player != thisPlayer:
+                offset = -1
+            if (state.game_over()):
+                if state.get_winner() == thisPlayer:
+                    return 100
+                else:
+                    return -100
+            for pawn in range(len(state.cur_pos[0])):
+                utility += offset * (len(state.move_dir(player, pawn)))
         return utility
