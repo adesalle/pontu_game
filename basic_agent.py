@@ -20,21 +20,44 @@ class MyAgent(AlphaBetaAgent):
   state s.
   """
   def successors(self, state):
-    actions = state.get_current_player_actions()
-    for action in actions:
-      newState = state.copy().apply_action(action)
-      yield (action, newState)
+    if state != None:
+      actions = state.get_current_player_actions()
+      list = []
+      for action in actions:
+
+        if state.is_action_valid(action):
+          newState = state.copy()
+          newState.apply_action()
+          list.add((action, newState))
+      return list
 
   """
   The cutoff function returns true if the alpha-beta/minimax
   search has to stop and false otherwise.
   """
   def cutoff(self, state, depth):
-    return depth <= 1 and state.game_over();
+    if state != None:
+      return depth < 1 and state.game_over()
+    return depth < 1
 
   """
   The evaluate function must return an integer value
   representing the utility function of the board.
   """
   def evaluate(self, state):
-    pass
+    utility = 0
+    thisPlayer = state.cur_player
+    advPlayer = 1 - thisPlayer
+    for player in (thisPlayer, advPlayer):
+      offset = 1
+      if player != thisPlayer:
+        offset = -1
+
+      if(state.game_over()):
+        if state.get_winner() == thisPlayer:
+          return 100
+        else:
+          return -100
+      for pawn in range(state.size()-2):
+        utility += offset * (len(state.move_dir(player, pawn)))
+      return utility

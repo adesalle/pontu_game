@@ -18,7 +18,7 @@ if __name__ == '__main__':
   args = parser.parse_args()
 
   agent0 = args.ai0 if args.ai0 != None else "human_agent"
-  agent1 = args.ai1 if args.ai1 != None else "human_agent"
+  agent1 = args.ai1 if args.ai1 != None else "basic_agent"
   time_out = float(args.t) if args.t != None else 900.0
   first = int(args.f) if args.f == '1' or args.f == '0' else None
   display_gui = args.g == None or args.g.lower() == "true"
