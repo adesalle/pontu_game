@@ -15,6 +15,8 @@ class MyAgent(AlphaBetaAgent):
         self.time_left = None
         self.allTime = None
         self.last_action = None
+        self.time = 100
+        self.cur_depth = 0
 
     def get_action(self, state, last_action, time_left):
         self.last_action = last_action
@@ -22,6 +24,7 @@ class MyAgent(AlphaBetaAgent):
         if(self.allTime == None):
             self.allTime = time_left
             self.pawns = state.size - 2
+        self.time = self.time_left * 100 / self.allTime
         return minimax.search(state, self)
 
 
@@ -37,8 +40,6 @@ class MyAgent(AlphaBetaAgent):
             newState = state.copy()
             newState.apply_action(action)
             yield action, newState
-            if state.game_over() and self.id == state.get_winner():
-                return
 
 
 
@@ -48,30 +49,37 @@ class MyAgent(AlphaBetaAgent):
   """
 
     def cutoff(self, state, depth):
-        if self.allTime * 100 / self.time_left < 0.15:
-            return not (depth < 1) or state.game_over()
-        if state.turns > 8:
+        self.cur_depth = depth
+        if self.time < 15:
+            return not (depth < 2) or state.game_over()
+        if state.turns > 6:
             return not (depth < 3) or state.game_over()
-        return not(depth < 2) or state.game_over()
+        if state.turns > 9:
+            return not (depth < 4) or state.game_over()
+        if state.turns > 12:
+            return not (depth < 5) or state.game_over()
+        return not(depth < 1) or state.game_over()
 
     """
   The evaluate function must return an integer value
   representing the utility function of the board.
   """
-
     def evaluate(self, state):
         utility = 0
         thisPlayer = self.id
         advPlayer = 1 - thisPlayer
-        if (state.game_over()):
-            if state.get_winner() == thisPlayer:
-                return 500
-            else:
-                return 0
-        for pawn in range(len(state.cur_pos[thisPlayer])):
-            utility += len(state.move_dir(thisPlayer, pawn))
-        for pawn in range(len(state.cur_pos[advPlayer])):
-            utility += 4 - len(state.move_dir(advPlayer, pawn))
+        for player in (thisPlayer, advPlayer):
+            offset = 1
+            if player != thisPlayer:
+                offset = -1
+            if (state.game_over()):
+                if state.get_winner() == thisPlayer:
+                    return 500
+                else:
+                    return -500
 
+            for pawn in range(len(state.cur_pos[0])):
+                utility += offset * 5 * (len(state.move_dir(player, pawn)))
 
         return utility
+
