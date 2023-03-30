@@ -51,14 +51,14 @@ class MyAgent(AlphaBetaAgent):
     def cutoff(self, state, depth):
         self.cur_depth = depth
         if self.time < 15:
-            return not (depth < 2) or state.game_over()
-        if state.turns > 6:
+            return not (depth < 1) or state.game_over()
+        if state.turns > 4:
             return not (depth < 3) or state.game_over()
         if state.turns > 9:
             return not (depth < 4) or state.game_over()
         if state.turns > 12:
             return not (depth < 5) or state.game_over()
-        return not(depth < 1) or state.game_over()
+        return not(depth < 2) or state.game_over()
 
     """
   The evaluate function must return an integer value
