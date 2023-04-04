@@ -30,7 +30,7 @@ if __name__ == '__main__':
   initial_state = PontuState()
   if first is not None:
     initial_state.cur_player = first
-  initial_state.cur_player = 0
+  initial_state.cur_player = 1
   agent0 = getattr(__import__(agent0), 'MyAgent')()
   agent0.set_id(0)
   agent1 = getattr(__import__(agent1), 'MyAgent')()
