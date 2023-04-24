@@ -5,6 +5,7 @@ import minimax
 Agent skeleton. Fill in the gaps.
 """
 
+AcceptRange = 1.1
 DIRECTIONS = ['WEST','NORTH','EAST','SOUTH']
 class MyAgent(AlphaBetaAgent):
     """
@@ -39,11 +40,68 @@ class MyAgent(AlphaBetaAgent):
 
     def successors(self, state):
         actions = state.get_current_player_actions()
+        actions.sort(key= lambda x : self.move_dir_pos(state, (x[3], x[4])))
+        currPlayerAction = []
         for action in actions:
             newState = state.copy()
             newState.apply_action(action)
-            yield action, newState
+            if state.cur_player == 1 - self.id:
+                yield action, newState
+            else:
+                if len(state.history) <20:
+                    currPlayerAction.append((action, newState))
+                else:
+                    yield action, newState
+        if len(currPlayerAction) != 0:
+            newList = self.giveBestUtility(currPlayerAction)
+            for nl in newList:
+                yield nl
 
+    def move_dir_pos(self, state, pos):
+        dirs = []
+        adj_bridges = state.adj_bridges_pos(pos)
+        adj_pawns = state.adj_pawns_pos(pos)
+        for dir in DIRECTIONS:
+            if adj_bridges[dir] and not adj_pawns[dir]:
+                dirs.append(dir)
+        return len(dirs)
+
+    def giveBestUtility(self, actions):
+        best = None
+        listPreTrier = []
+        for action in actions:
+            actionUtility = self.evaluate(action[1])
+            actionUtility1 = actionUtility
+            if actionUtility1 < 0:
+                actionUtility1 /= AcceptRange
+            else:
+                actionUtility1 *= AcceptRange
+            if best is None:
+                best = actionUtility
+            if actionUtility >= best:
+                best = actionUtility
+                listPreTrier.append((best, action))
+                listPreTrier.sort(key=lambda x: x[0], reverse=True)
+            elif actionUtility1 >= best:
+                listPreTrier.append((actionUtility, action))
+
+        listPreTrier.sort(key=lambda x: x[0], reverse=True)
+        index = 0
+        lastUtility = listPreTrier[index][0]
+        if lastUtility < 0:
+            lastUtility /= AcceptRange
+        else:
+            lastUtility *= AcceptRange
+        while lastUtility >= best:
+            yield listPreTrier[index][1][0], listPreTrier[index][1][1]
+            index +=1
+            if index == len(listPreTrier):
+                break
+            lastUtility = listPreTrier[index][0]
+            if lastUtility < 0:
+                lastUtility /= AcceptRange
+            else:
+                lastUtility *= AcceptRange
 
 
     """
@@ -52,11 +110,25 @@ class MyAgent(AlphaBetaAgent):
   """
 
     def cutoff(self, state, depth):
+        global AcceptRange
         if self.time < 18:
             return not (depth < 1) or state.game_over()
-        if state.turns > 10:
+        #Normaly never done
+        if state.turns > 33:
+            AcceptRange = 2.3
+            return not (depth < 5) or state.game_over()
+
+        if state.turns > 27:
+            AcceptRange = 1.6
+            return not (depth < 5) or state.game_over()
+        if state.turns > 17:
+            AcceptRange = 1.5
+            return not (depth < 4) or state.game_over()
+        if state.turns > 7:
+            AcceptRange = 1.3
             return not (depth < 3) or state.game_over()
-        return not(depth < 2) or state.game_over()
+
+        return not(depth < 3) or state.game_over()
 
     """
   The evaluate function must return an integer value
